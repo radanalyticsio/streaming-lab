@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+# Execute the default S2I script
+source ${STI_SCRIPTS_PATH}/assemble
+
+python -m spacy download en
