@@ -14,6 +14,9 @@ import collections
 
 import gzip
 
+import codecs
+import json
+
 def train_markov_gutenberg_txt(fn):
     """ trains a Markov model on text data from Project Gutenberg """
     with codecs.open(fn, "r", "cp1252") as f:
