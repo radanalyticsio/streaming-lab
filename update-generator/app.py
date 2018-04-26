@@ -57,7 +57,7 @@ class UserTable(object):
             return choose_from(self._moderate)
 
 import spacy
-nlp = spacy.load('en')
+nlp = spacy.load('en_core_web_sm')
 
 def make_sentence(model, length=200):
     return model.make_short_sentence(length)
