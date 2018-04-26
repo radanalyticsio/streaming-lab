@@ -13,9 +13,6 @@ import math
 import collections
 
 import gzip
-import codecs
-
-import json
 
 def train_markov_gutenberg_txt(fn):
     """ trains a Markov model on text data from Project Gutenberg """
@@ -60,7 +57,7 @@ class UserTable(object):
             return choose_from(self._moderate)
 
 import spacy
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('en')
 
 def make_sentence(model, length=200):
     return model.make_short_sentence(length)
@@ -151,6 +148,10 @@ def main(args):
     logging.info('rate={}'.format(args.rate))
     logging.info('source={}'.format(args.source))
 
+    logging.info('downloading source')
+    dl = urllib.urlretrieve(args.source)
+    sourcefile = open(dl[0])
+
     logging.info('creating Markov chains')
     
     austen_model = train_markov_gutenberg_txt("austen.txt")
@@ -171,11 +172,11 @@ def main(args):
     while True:
         update = {"update_id" : "%020d" % update_id}
         update_id += 1
-        userid, text = next(ug)
-        update["userid"] = "%010d" % userid
+        userid, text = ug.next()
+        update["user_id"] = "%010d" % userid
         update["text"] = text
         
-        producer.send(args.topic, bytes(json.dumps(update), "utf-8"))
+        producer.send(args.topic, json.dumps(update))
         time.sleep(1.0 / args.rate)
     logging.info('finished sending source')
 
@@ -209,7 +210,7 @@ if __name__ == '__main__':
             '--rate',
             type=int,
             help='Lines per second, env variable RATE',
-            default=10)
+            default=100)
     parser.add_argument(
             '--source',
             help='The source URI for data to emit, env variable SOURCE_URI')
