@@ -34,7 +34,7 @@ class UserTable(object):
     The assumption is that talkative users represent a proportion p of all users 
     but 1 - p of all utterances. 
     """
-    def __init__(self, size, weights=[8, 2]):
+    def __init__(self, size, weights=[92, 8]):
         self._talkative = collections.deque()
         self._moderate = collections.deque()
         self._size = size
@@ -148,10 +148,6 @@ def main(args):
     logging.info('rate={}'.format(args.rate))
     logging.info('source={}'.format(args.source))
 
-    logging.info('downloading source')
-    dl = urllib.urlretrieve(args.source)
-    sourcefile = open(dl[0])
-
     logging.info('creating Markov chains')
     
     austen_model = train_markov_gutenberg_txt("austen.txt")
@@ -172,11 +168,11 @@ def main(args):
     while True:
         update = {"update_id" : "%020d" % update_id}
         update_id += 1
-        userid, text = ug.next()
+        userid, text = next(ug)
         update["user_id"] = "%010d" % userid
         update["text"] = text
         
-        producer.send(args.topic, json.dumps(update))
+        producer.send(args.topic, bytes(json.dumps(update), "utf-8"))
         time.sleep(1.0 / args.rate)
     logging.info('finished sending source')
 
@@ -210,7 +206,7 @@ if __name__ == '__main__':
             '--rate',
             type=int,
             help='Lines per second, env variable RATE',
-            default=100)
+            default=40)
     parser.add_argument(
             '--source',
             help='The source URI for data to emit, env variable SOURCE_URI')
