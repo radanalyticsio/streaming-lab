@@ -34,3 +34,19 @@ this [JSON Schema](http://json-schema.org) notation:
 }
 ```
 
+## Stream analyzer service
+
+The stream analyzer service, `update-analyzer`, is a Python application
+which uses Apaceh Spark to process the stream data as it arrives. After each
+update is processed by the analyzer, it is sent to a visualizer,
+`update-visualizer` application by a HTTP based request. In this manner, the
+data processing that is occurring in the analyzer can be viewed by a user.
+
+The following diagram represents the architecture of this application
+pipeline:
+
+![architecture](architecture.svg)
+
+### Deployment
+
+WIP
