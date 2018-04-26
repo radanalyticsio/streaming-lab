@@ -175,7 +175,7 @@ def main(args):
         update["userid"] = "%010d" % userid
         update["text"] = text
         
-        producer.send(args.topic, json.dumps(update))
+        producer.send(args.topic, bytes(json.dumps(update), "utf-8"))
         time.sleep(1.0 / args.rate)
     logging.info('finished sending source')
 
