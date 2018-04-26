@@ -209,7 +209,7 @@ if __name__ == '__main__':
             '--rate',
             type=int,
             help='Lines per second, env variable RATE',
-            default=100)
+            default=10)
     parser.add_argument(
             '--source',
             help='The source URI for data to emit, env variable SOURCE_URI')
