@@ -7,6 +7,7 @@ import os
 import pyspark
 from pyspark import streaming
 from pyspark.streaming import kafka as kstreaming
+import spacy
 
 
 def main(args):
@@ -17,7 +18,18 @@ def main(args):
             [args.topic],
             {'bootstrap.servers': args.brokers})
 
-    def analyze_update(rdd):
+    def analyze_updates(rdd):
+        def run_analyzer(u):
+            english = spacy.load('en_core_web_sm')
+            nu = json.loads(u)
+            result = english(nu.get('text', ''))
+            from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+            analyzer = SentimentIntensityAnalyzer()
+            sentiment = [analyzer.polarity_scores(str(s))
+                         for s in list(result.sents)]
+            nu.update(sentiment=sentiment)
+            return nu
+
         def post_update(u):
             try:
                 con = httplib.HTTPConnection(host=args.vhost,
@@ -28,10 +40,10 @@ def main(args):
                 logging.warn('unable to POST to visualizer, error:')
                 logging.warn(e.message)
 
-        rdd.foreach(post_update)
+        rdd.map(run_analyzer).foreach(post_update)
 
     messages = kafka_stream.map(lambda m: m[1])
-    messages.foreachRDD(analyze_update)
+    messages.foreachRDD(analyze_updates)
     streaming_context.start()
     streaming_context.awaitTermination()
 
