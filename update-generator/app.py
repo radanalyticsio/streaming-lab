@@ -176,7 +176,7 @@ def main(args):
         update["text"] = text
         
         producer.send(args.topic, bytes(json.dumps(update), "utf-8"))
-        time.sleep(1.0 / args.rate)
+        time.sleep(1.0 / float(args.rate))
     logging.info('finished sending source')
 
 
