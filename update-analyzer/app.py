@@ -18,15 +18,17 @@ def main(args):
             {'bootstrap.servers': args.brokers})
 
     def analyze_update(rdd):
-        for r in rdd.collect():
+        def post_update(u):
             try:
                 con = httplib.HTTPConnection(host=args.vhost,
                                              port=args.vport)
-                con.request('POST', '/', body=json.dumps(r))
+                con.request('POST', '/', body=json.dumps(u))
                 con.close()
             except Exception as e:
                 logging.warn('unable to POST to visualizer, error:')
                 logging.warn(e.message)
+
+        rdd.foreach(post_update)
 
     messages = kafka_stream.map(lambda m: m[1])
     messages.foreachRDD(analyze_update)
