@@ -29,6 +29,65 @@ For a basic Apache Kafka installation on OpenShift, we recommend these
 [instruction from Strimzi](http://strimzi.io/docs/0.1.0/#kafka-in-memory) as a
 starting point.
 
+### Synthetic social media update service
+
+As the core of this lab is about processing and analyzing social media
+updates, there is a service application that will produce these updates. The
+`update-generator` directory contains the source and related files for
+deploying this service.
+
+Before beginning this deployment you should already have a Kafka instance
+running. Please record the hostname and port for the broker as you will need
+it in this command. To deploy the generator simply run the following command
+using the `oc` OpenShift tool:
+
+```
+oc new-app centos/python-34-centos7~https://github.com/radanalyticsio/streaming-lab/ \
+  --context-dir=update-generator \
+  -e KAFKA_BROKERS=<INSERT YOUR BROKER HOSTNAME:PORT HERE> \
+  -e KAFKA_TOPIC=social-firehose \
+  --name=emitter
+```
+
+## Jupyter
+
+[Jupyter](https://jupyter.org/) is an open source project born out of the
+[IPython Project](https://ipython.org/) which delivers an in-browser
+experience for interactive data science and scientific computing with support
+for several programming languages. In this lab we will utilize Python, Apache
+Spark, and a few natural language processing libraries.
+
+The first portion of this lab is conducted through the lessons available in
+the Jupyter notebooks contained in this repository.
+
+### Launching a notebook
+
+WIP
+
+## Analytics services on OpenShift
+
+The second portion of this lab focuses on building and deploying an analytics
+service based on the techniques learned in the notebooks.
+
+There are two services which will be deployed, the `update-analyzer`, and
+the `update-visualizer`. The analyzer will utilize Apache Spark to process
+the synthetic social media updates and apply sentiment scores to each update.
+The visualizer gives the user an interface to examine some of the work that
+is being done by the analyzer, it does this by display updates along with
+the sentiment scores they have received.
+
+This diagram shows an overview of the architecture for these services:
+
+![architecture](architecture.svg)
+
+### Launching the update visualizer
+
+WIP
+
+### Launching the  analyzer services
+
+WIP
+
 ## Advanced details
 
 The following sections provide an in-depth look at individual components of
@@ -65,17 +124,4 @@ this [JSON Schema](http://json-schema.org) notation:
     "required": ["user_id", "update_id", "text"]
 }
 ```
-
-### Stream analyzer service
-
-The stream analyzer service, `update-analyzer`, is a Python application
-which uses Apaceh Spark to process the stream data as it arrives. After each
-update is processed by the analyzer, it is sent to a visualizer,
-`update-visualizer` application by a HTTP based request. In this manner, the
-data processing that is occurring in the analyzer can be viewed by a user.
-
-The following diagram represents the architecture of this application
-pipeline:
-
-![architecture](architecture.svg)
 
