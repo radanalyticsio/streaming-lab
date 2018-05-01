@@ -60,6 +60,11 @@ Spark, and a few natural language processing libraries.
 The first portion of this lab is conducted through the lessons available in
 the Jupyter notebooks contained in this repository.
 
+This diagram shows an overview of the architecture for this portion of the
+lab:
+
+![notebook architecture](notebook-architecture.svg)
+
 ### Launching a notebook
 
 WIP
@@ -78,7 +83,7 @@ the sentiment scores they have received.
 
 This diagram shows an overview of the architecture for these services:
 
-![architecture](architecture.svg)
+![services architecture](services-architecture.svg)
 
 ### Launching the update visualizer
 
