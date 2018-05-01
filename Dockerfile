@@ -26,7 +26,7 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
 USER $NB_UID
 ENV HOME /home/$NB_USER
 
-# ADD *.ipynb /notebooks/
+ADD *.ipynb /notebooks/
 
 LABEL io.k8s.description="PySpark Jupyter Notebook." \
       io.k8s.display-name="PySpark Jupyter Notebook." \
