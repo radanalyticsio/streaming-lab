@@ -34,4 +34,4 @@ LABEL io.k8s.description="PySpark Jupyter Notebook." \
       io.k8s.display-name="PySpark Jupyter Notebook." \
       io.openshift.expose-services="8888:http"
 
-CMD ["/entrypoint", "/start.sh"]
+CMD ["/entrypoint", "/usr/local/bin/start.sh"]
