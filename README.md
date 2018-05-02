@@ -63,7 +63,7 @@ the Jupyter notebooks contained in this repository.
 This diagram shows an overview of the architecture for this portion of the
 lab:
 
-![notebook architecture](notebook-architecture.svg)
+![notebook architecture](assets/notebook-architecture.svg)
 
 ### Launching a notebook
 
@@ -83,11 +83,58 @@ the sentiment scores they have received.
 
 This diagram shows an overview of the architecture for these services:
 
-![services architecture](services-architecture.svg)
+![services architecture](assets/services-architecture.svg)
 
 ### Launching the update visualizer
 
-WIP
+The following screenshots provide a detailed illustration of deploying the
+update visualizer. During this process you will build and deploy the
+visualizer on OpenShift.
+
+**Step 1. Select the Python builder**
+
+Begin by clicking the "Add to Project" drop down menu in the upper right of
+the OpenShift console and selecting the "Browse Catalog" option.
+
+![visuazlier 1](assets/visualizer-1.png)
+
+Next, locate the "Python" option in the service catalog and select it.
+
+![visuazlier 2](assets/visualizer-2.png)
+
+**Step 2. Fill in the details for the Python build**
+
+On the first dialog window, simply select the "Next" option.
+
+![visuazlier 3](assets/visualizer-3.png)
+
+On the second dialog window, you will need to select the project for your
+deployment with the "Add to Project" dropdown. Then enter a name for your
+application in the "Application Name" form. Finally you will enter the
+URL for the source code repository in the "Git Repository" form, for the
+visualizer the repository URL is
+`https://github.com/radanalyticsio/streaming-lab`. With these options filled,
+you will need to select the "advanced options" link to add a final detail.
+
+![visuazlier 4](assets/visualizer-4.png)
+
+In the advanced options page, locate the form entry named "Context Dir" and
+add the value `update-visualizer`.
+
+![visuazlier 5](assets/visualizer-5.png)
+
+**Step 3. Start the build and deploy process**
+
+With all the details filled in, simply select the "Create" button to begin
+the process.
+
+![visuazlier 6](assets/visualizer-6.png)
+
+Upon creation you will be presented with a final status page, simply select
+the "Continue to project overview." link to monitor the progress of your
+application deployment.
+
+![visuazlier 7](assets/visualizer-7.png)
 
 ### Launching the  analyzer services
 
