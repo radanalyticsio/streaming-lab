@@ -17,7 +17,8 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && find /home/$NB_USER -type f -exec chmod g+rw {} \; \
     && find /data -type d -exec chmod g+rwx,o+rx {} \; \
     && find /data -type f -exec chmod g+rw {} \; \
-    && /opt/conda/bin/pip install spacy terminado vaderSentiment \
+    && /opt/conda/bin/conda install -c conda-forge --yes spacy \
+    && /opt/conda/bin/pip install terminado vaderSentiment \
     && /opt/conda/bin/python -m spacy download en \
     && /opt/conda/bin/conda clean -tipsy \
     && chmod -f g+rw /notebooks/*
