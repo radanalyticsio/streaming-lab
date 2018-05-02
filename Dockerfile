@@ -17,16 +17,18 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && find /home/$NB_USER -type f -exec chmod g+rw {} \; \
     && find /data -type d -exec chmod g+rwx,o+rx {} \; \
     && find /data -type f -exec chmod g+rw {} \; \
-    && /opt/conda/bin/conda install -c conda-forge --yes spacy \
-    && /opt/conda/bin/pip install terminado vaderSentiment \
+    && /opt/conda/bin/conda install --quiet --yes -c conda-forge spacy \
+    && /opt/conda/bin/conda install --quiet --yes terminado \
+    && /opt/conda/bin/pip install vaderSentiment \
     && /opt/conda/bin/python -m spacy download en \
-    && /opt/conda/bin/conda clean -tipsy \
-    && chmod -f g+rw /notebooks/*
+    && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
+    && chmod -f g+rw /notebooks $(find /notebooks) 
 
 USER $NB_UID
 ENV HOME /home/$NB_USER
 
 ADD *.ipynb /notebooks/
+ADD *.txt *.txt.gz /notebooks/
 
 LABEL io.k8s.description="PySpark Jupyter Notebook." \
       io.k8s.display-name="PySpark Jupyter Notebook." \
