@@ -69,7 +69,7 @@ items:
             forcePull: true
             from:
               kind: DockerImage
-              name: radanalyticsio/radanalytics-pyspark:v0.4.6
+              name: docker.io/elmiko/radanalytics-pyspark:2.2.1-streaming-lab
           type: Source
         triggers:
         - imageChange: {}
