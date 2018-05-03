@@ -24,11 +24,13 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
     && chmod -f g+rw /notebooks $(find /notebooks) 
 
+ADD *.txt *.txt.gz /notebooks/
+ADD *.ipynb /notebooks/
+
+RUN chmod -f g+rw /notebooks $(find /notebooks) 
+
 USER $NB_UID
 ENV HOME /home/$NB_USER
-
-ADD *.ipynb /notebooks/
-ADD *.txt *.txt.gz /notebooks/
 
 LABEL io.k8s.description="PySpark Jupyter Notebook." \
       io.k8s.display-name="PySpark Jupyter Notebook." \
