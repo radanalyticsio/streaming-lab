@@ -327,3 +327,65 @@ items:
       - name: OSHINKO_REFRESH_INTERVAL
         value: "5"
         description: Refresh interval for updating cluster list in seconds
+
+  - apiVersion: v1
+    kind: Template
+    template: streaming-lab-notebook
+    metadata:
+      name: streaming-lab-notebook
+    objects:
+    - kind: Service
+      apiVersion: v1
+      metadata:
+        name: ${APPLICATION_NAME}
+        labels:
+          name: ${APPLICATION_NAME}
+      spec:
+        ports:
+          - protocol: TCP
+            port: 8888
+            targetPort: 8888
+        selector:
+          name: ${APPLICATION_NAME}
+    - kind: Route
+      apiVersion: v1
+      metadata:
+        name: ${APPLICATION_NAME}
+      spec:
+        host: ${ROUTE_HOSTNAME}
+        to:
+          kind: Service
+          name: ${APPLICATION_NAME}
+    - kind: DeploymentConfig
+      apiVersion: v1
+      metadata:
+        name: ${APPLICATION_NAME}
+      spec:
+        strategy:
+          type: Rolling
+        triggers:
+          - type: ConfigChange
+        replicas: 1
+        selector:
+          name: ${APPLICATION_NAME}
+        template:
+          metadata:
+            labels:
+              name: ${APPLICATION_NAME}
+          spec:
+            containers:
+              - name: ${APPLICATION_NAME}
+                image: docker.io/willb/streaming-lab-notebook:develop
+                env:
+                  - name: JUPYTER_NOTEBOOK_PASSWORD
+                    value: developer
+                ports:
+                  - containerPort: 8888
+                    protocol: TCP
+    parameters:
+      - name: APPLICATION_NAME
+        description: the application name
+        value: streaming-lab-notebook
+      - name: ROUTE_HOSTNAME
+        description: a hostname for the route
+     
