@@ -5,7 +5,7 @@ A Python application that emits synthetic social media updates to an Apache Kafk
 ## Launching on OpenShift
 
 ```
-oc new-app centos/python-34-centos7~https://github.com/radanalyticsio/streaming-lab/ \
+oc new-app centos/python-36-centos7~https://github.com/radanalyticsio/streaming-lab/ \
   --context-dir=update-generator \
   -e KAFKA_BROKERS=my-cluster-kafka:9092 \
   -e KAFKA_TOPIC=social-firehose \
