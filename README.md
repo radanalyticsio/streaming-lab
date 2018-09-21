@@ -42,7 +42,7 @@ it in this command. To deploy the generator simply run the following command
 using the `oc` OpenShift tool:
 
 ```
-oc new-app centos/python-34-centos7~https://github.com/radanalyticsio/streaming-lab/ \
+oc new-app centos/python-36-centos7~https://github.com/radanalyticsio/streaming-lab/ \
   --context-dir=update-generator \
   -e KAFKA_BROKERS=<INSERT YOUR BROKER HOSTNAME:PORT HERE> \
   -e KAFKA_TOPIC=social-firehose \
