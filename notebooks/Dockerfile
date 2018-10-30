@@ -20,7 +20,7 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/conda install --quiet --yes -c conda-forge spacy \
     && /opt/conda/bin/conda install --quiet --yes terminado \
     $$ /opt/conda/bin/conda install --quiet --yes opencv \
-    && /opt/conda/bin/pip install vaderSentiment \
+    && /opt/conda/bin/pip install vaderSentiment markovify \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
     && chmod -f g+rw /notebooks $(find /notebooks) 
