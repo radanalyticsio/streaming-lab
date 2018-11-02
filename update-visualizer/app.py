@@ -9,17 +9,32 @@ from flask import views
 from flask import json
 
 
-access_lock = threading.Lock()
-_last_data = {}
+class LastData():
+    def __init__(self):
+        self._access_lock = threading.Lock()
+        self._data = {
+            'last-seen': {},
+        }
+
+    def update(self, newdata):
+        self._access_lock.acquire()
+        self._data['last-seen'].update(copy.deepcopy(newdata))
+        self._access_lock.release()
+
+    def copy(self):
+        self._access_lock.acquire()
+        retval = copy.deepcopy(self._data)
+        self._access_lock.release()
+        return retval
+
+
+_last_data = LastData()
+
 
 def last_data(update=None):
-    access_lock.acquire()
     if update is not None:
-        global _last_data
-        _last_data = copy.deepcopy(update)
-    retval = copy.deepcopy(_last_data)
-    access_lock.release()
-    return retval
+        _last_data.update(update)
+    return _last_data.copy()
 
 
 class RootView(views.MethodView):
