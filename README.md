@@ -187,7 +187,7 @@ The value for the "APP_ARGS" will be in the following form:
 `--brokers=kafka.kafka.svc:9092 --topic=social-firehose --visualizer-host=visualizer --visualizer-port=8080`,
 the instructor for your lab will have updated information for these values.
 Next add the following value to the "SPARK_OPTIONS" field:
-`--packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0`. Lastly,
+`--packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.1`. Lastly,
 enter the name you chose for your Apache Spark cluster into the
 "OSHINKO_CLUSTER_NAME" field. With the configuration completed, you are now
 ready to click "Create".
