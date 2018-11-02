@@ -4,48 +4,92 @@ import json
 import logging
 import os
 
-import pyspark
-from pyspark import streaming
-from pyspark.streaming import kafka as kstreaming
-import spacy
+import pyspark.sql as sql
+import pyspark.sql.types as types
+import pyspark.sql.functions as functions
+import vaderSentiment.vaderSentiment as vader
+
+
+# This code is borrowed from Sparkling Pandas; see here:
+# https://github.com/sparklingpandas/sparklingml/blob/627c8f23688397a53e2e9e805e92a54c2be1cf3d/sparklingml/transformation_functions.py#L53
+class SpacyMagic(object):
+    """
+    Simple Spacy Magic to minimize loading time.
+    >>> SpacyMagic.get("en")
+    <spacy.en.English ...
+    """
+    _spacys = {}
+
+    @classmethod
+    def get(cls, lang):
+        if lang not in cls._spacys:
+            import spacy
+            cls._spacys[lang] = spacy.load(lang)
+        return cls._spacys[lang]
 
 
 def main(args):
-    spark_context = pyspark.SparkContext(appName='update-analyzer')
-    streaming_context = streaming.StreamingContext(spark_context, 1)
-    kafka_stream = kstreaming.KafkaUtils.createDirectStream(
-            streaming_context,
-            [args.topic],
-            {'bootstrap.servers': args.brokers})
+    spark = sql.SparkSession.builder.appName('update-analyzer').getOrCreate()
 
-    def analyze_updates(rdd):
-        def run_analyzer(u):
-            english = spacy.load('en_core_web_sm')
-            nu = json.loads(u)
-            result = english(nu.get('text', ''))
-            from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-            analyzer = SentimentIntensityAnalyzer()
-            sentiment = [analyzer.polarity_scores(str(s))
-                         for s in list(result.sents)]
-            nu.update(sentiment=sentiment)
-            return nu
+    msg_struct = types.StructType([
+        types.StructField('text', types.StringType(), True),
+        types.StructField('user_id', types.StringType(), True),
+        types.StructField('update_id', types.StringType(), True)
+    ])
 
-        def post_update(u):
-            try:
-                con = httplib.HTTPConnection(host=args.vhost,
-                                             port=args.vport)
-                con.request('POST', '/', body=json.dumps(u))
-                con.close()
-            except Exception as e:
-                logging.warn('unable to POST to visualizer, error:')
-                logging.warn(e.message)
+    analyzer = vader.SentimentIntensityAnalyzer()
+    analyzer_bcast = spark.sparkContext.broadcast(analyzer)
+    vhost_bcast = args.vhost
+    vport_bcast = args.vport
 
-        rdd.map(run_analyzer).foreach(post_update)
+    def sentiment_generator_impl(text, user_id, update_id):
+        va = analyzer_bcast.value
+        english = SpacyMagic.get('en_core_web_sm')
+        result = english(text)
+        sents = [str(sent) for sent in result.sents]
+        sentiments = [va.polarity_scores(str(s)) for s in sents]
+        obj = dict(user_id=user_id,
+                   update_id=update_id,
+                   text=text,
+                   sentiments=sentiments)
+        try:
+            con = httplib.HTTPConnection(host=vhost_bcast,
+                                         port=vport_bcast)
+            con.request('POST', '/', body=json.dumps(obj))
+            con.close()
+        except Exception as e:
+            logging.warn('unable to POST to visualizer, error:')
+            logging.warn(e.message)
 
-    messages = kafka_stream.map(lambda m: m[1])
-    messages.foreachRDD(analyze_updates)
-    streaming_context.start()
-    streaming_context.awaitTermination()
+    sentiment_generator = functions.udf(
+        sentiment_generator_impl, types.NullType())
+
+    records = (
+        spark
+        .readStream
+        .format('kafka')
+        .option('kafka.bootstrap.servers', args.brokers)
+        .option('subscribe', args.topic)
+        .load()
+        .select(
+            functions.column('value').cast(types.StringType()).alias('value'))
+        .select(
+            functions.from_json(
+                functions.column('value'), msg_struct).alias('json'))
+        .select(
+            functions.column('json.user_id'),
+            functions.column('json.update_id'),
+            functions.column('json.text'),
+            sentiment_generator(
+                functions.column('json.text'),
+                functions.column('json.user_id'),
+                functions.column('json.update_id')))
+        .writeStream
+        .format("console")
+        .start()
+    )
+
+    records.awaitTermination()
 
 
 def get_arg(env, default):

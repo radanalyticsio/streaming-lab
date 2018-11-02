@@ -18,7 +18,7 @@ oc new-app --template=oshinko-python-spark-build-dc \
   -p GIT_URI=https://github.com/radanalyticsio/streaming-lab \
   -p CONTEXT_DIR=update-analyzer \
   -p APP_ARGS='--brokers=kafka.kafka.svc:9092 --topic=firehose --visualizer-host=visualizer --visualizer-port=8080' \
-  -p SPARK_OPTIONS='--packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.1.0' \
+  -p SPARK_OPTIONS='--packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.1' \
   -p OSHINKO_CLUSTER_NAME=mycluster
 ```
 
