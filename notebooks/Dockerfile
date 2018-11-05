@@ -27,12 +27,12 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/pip install vaderSentiment markovify \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
-    && /opt/conda/bin/pip install /*.whl \
+    && /opt/conda/bin/pip install /darkflow*.whl tensorflow \
     && chmod -f g+rw /notebooks $(find /notebooks) 
 
 ADD *.txt *.txt.gz /notebooks/
 ADD *.ipynb /notebooks/
-
+ADD otto.jpg /notebooks
 
 RUN chmod -f g+rw /notebooks $(find /notebooks) 
 
