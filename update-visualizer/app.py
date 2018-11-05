@@ -1,7 +1,6 @@
-import argparse
 import copy
 import logging
-import os
+import math
 import threading
 
 import flask
@@ -14,11 +13,33 @@ class LastData():
         self._access_lock = threading.Lock()
         self._data = {
             'last-seen': {},
+            'most-positive': {},
+            'most-negative': {},
         }
+
+    @staticmethod
+    def get_compound_average(sentiments):
+        """return the average compound sentiment from a list of sentiments"""
+        if len(sentiments) > 0:
+            compounds = [s.get('compound', 0) for s in sentiments]
+            avg = math.fsum(compounds) / len(sentiments)
+        else:
+            avg = 0
+        return avg
 
     def update(self, newdata):
         self._access_lock.acquire()
-        self._data['last-seen'].update(copy.deepcopy(newdata))
+        self._data['last-seen'] = copy.deepcopy(newdata)
+        new_cavg = LastData.get_compound_average(
+                self._data['last-seen'].get('sentiments', []))
+        pos_cavg = LastData.get_compound_average(
+                self._data['most-positive'].get('sentiments', []))
+        neg_cavg = LastData.get_compound_average(
+                self._data['most-negative'].get('sentiments', []))
+        if new_cavg >= pos_cavg:
+            self._data['most-positive'] = self._data['last-seen']
+        if new_cavg <= neg_cavg:
+            self._data['most-negative'] = self._data['last-seen']
         self._access_lock.release()
 
     def copy(self):
@@ -63,4 +84,3 @@ if __name__ == '__main__':
     logging.info('starting update-visualizer')
     main()
     logging.info('exiting')
-
