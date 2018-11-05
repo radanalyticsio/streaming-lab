@@ -2,9 +2,12 @@ FROM radanalyticsio/jupyter-notebook-py3.5
 
 USER root
 RUN mkdir /data
+RUN mkdir /notebooks/cfg
 
-ADD https://pjreddie.com/media/files/yolov3.weights /data/
-ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg /data/
+ADD https://raw.githubusercontent.com/thtrieu/darkflow/master/cfg/coco.names /notebooks/cfg
+ADD https://pjreddie.com/media/files/yolov2.weights /data/yolo.weights
+ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg /notebooks/cfg/yolo.cfg
+
 ADD *.whl /
 
 ENV NB_USER=nbuser
