@@ -5,6 +5,7 @@ RUN mkdir /data
 
 ADD https://pjreddie.com/media/files/yolov3.weights /data/
 ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg /data/
+ADD *.whl /
 
 ENV NB_USER=nbuser
 ENV NB_UID=1011
@@ -26,7 +27,7 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/pip install vaderSentiment markovify \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
-    && /opt/conda/bin/pip install darkflow*whl tensorflow*whl \
+    && /opt/conda/bin/pip install /*.whl \
     && chmod -f g+rw /notebooks $(find /notebooks) 
 
 ADD *.txt *.txt.gz /notebooks/
