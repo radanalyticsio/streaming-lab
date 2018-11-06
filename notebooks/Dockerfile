@@ -1,9 +1,10 @@
 FROM radanalyticsio/jupyter-notebook-py3.5
 
 USER root
-RUN mkdir /data
+RUN mkdir /data && mkdir /data/images
 RUN mkdir /notebooks/cfg
 
+ADD images /data/images
 ADD https://raw.githubusercontent.com/thtrieu/darkflow/master/cfg/coco.names /notebooks/cfg
 ADD https://pjreddie.com/media/files/yolov2.weights /data/yolo.weights
 ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg /notebooks/cfg/yolo.cfg
@@ -27,10 +28,12 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/conda install --quiet --yes -c conda-forge spacy \
     && /opt/conda/bin/conda install --quiet --yes terminado \
     && /opt/conda/bin/conda install --quiet --yes opencv \
-    && /opt/conda/bin/pip install vaderSentiment markovify \
+    && /opt/conda/bin/pip install vaderSentiment markovify fileupload \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
     && /opt/conda/bin/pip install /darkflow*.whl tensorflow \
+    && /opt/conda/bin/jupyter nbextension install --py fileupload \
+    && /opt/conda/bin/jupyter nbextension enable --py fileupload \
     && chmod -f g+rw /notebooks $(find /notebooks) 
 
 ADD *.txt *.txt.gz /notebooks/
