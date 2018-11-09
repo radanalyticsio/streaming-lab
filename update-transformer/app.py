@@ -28,7 +28,7 @@ class SpacyMagic(object):
 
 
 def main(args):
-    spark = sql.SparkSession.builder.appName('update-mutator').getOrCreate()
+    spark = sql.SparkSession.builder.appName('update-transformer').getOrCreate()
 
     msg_struct = types.StructType([
         types.StructField('text', types.StringType(), True),
