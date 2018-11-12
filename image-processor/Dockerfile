@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/f29/s2i-base:latest
+FROM fedora:26
 
 USER root
 RUN mkdir /opt-app-root
@@ -10,25 +10,11 @@ ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg /op
 
 WORKDIR /opt/app-root
 
-ENV PYTHON_VERSION=3.6 \
-    PATH=$HOME/.local/bin/:$PATH \
-    PYTHONUNBUFFERED=1 \
-    PYTHONIOENCODING=UTF-8 \
-    LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    PIP_NO_CACHE_DIR=off
-
-ENV NAME=python3 \
-    VERSION=0 \
-    RELEASE=1 \
-    ARCH=x86_64
-
-
-RUN INSTALL_PKGS="python3 python3-devel python3-setuptools python3-pip libSM libXrender libXext" && \
-        dnf -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
-        dnf -y clean all --enablerepo='*'&& \
+RUN INSTALL_PKGS="python3 libstdc++ python3-devel python3-setuptools python3-pip libSM libXrender libXext" && \
+        yum -y --setopt=tsflags=nodocs install $INSTALL_PKGS && \
+        yum -y clean all --enablerepo='*'&& \
         pip3 install -r /opt/app-root/requirements.txt && \
-        pip3 install -r /opt/app-root/darkflow-1.0.0-cp36-cp36m-linux_x86_64.whl && \
+        pip3 install /opt/app-root/darkflow-1.0.0-cp36-cp36m-linux_x86_64.whl && \
         rm /opt/app-root/requirements.txt
 
 RUN chmod 777 /opt/app-root /opt/app-root/ /opt/app-root/*
@@ -38,9 +24,11 @@ RUN chown 185 /opt/app-root
 EXPOSE 8080
 
 LABEL io.k8s.description="image processor" \
-      io.k8s.display-name="image-uploader-service" \
+      io.k8s.display-name="image-processor-service" \
       io.openshift.expose-services="8080:http" 
 
 USER 185
 
-CMD python3 ./app.py
+ENTRYPOINT ["python3"]
+
+CMD ["./app.py"]
