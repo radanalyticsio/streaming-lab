@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+# Execute the default S2I script
+source scl_source enable rh-python36
+exec ${STI_SCRIPTS_PATH}/run
