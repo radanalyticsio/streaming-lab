@@ -18,16 +18,30 @@ machine learning.
 
 ## Prerequisites
 
-This lab requires access to an OpenShift cluster for deployment and operation
-of applications, and an Apache Kafka broker for transmitting messages.
+* An OpenShift cluster available. For instructions on installing OpenShift
+  (including ad-hoc single node test clusters), please see the
+  [OpenShift Getting Started](https://docs.openshift.org/latest/getting_started/administrators.html#getting-started-administrators)
+  documentation.
 
-For instructions on installing OpenShift, please see the
-[OpenShift Getting Started](https://docs.openshift.org/latest/getting_started/administrators.html#getting-started-administrators)
-documentation.
+* An Apache Kafka broker available. For a basic Apache Kafka installation on
+  OpenShift, we recommend these
+  [instruction from Strimzi](http://strimzi.io/docs/0.1.0/#kafka-in-memory)
+  as a starting point. Be sure to record the broker addresses for future use.
 
-For a basic Apache Kafka installation on OpenShift, we recommend these
-[instruction from Strimzi](http://strimzi.io/docs/0.1.0/#kafka-in-memory) as a
-starting point.
+* A terminal with the OpenShift client `oc` available with an active login
+  session.
+
+* The `oshinko` command line tool available in your terminal. The `oshinko`
+  binary can be downloaded from its
+  [release page on Github](https://github.com/radanalyticsio/oshinko-cli/releases).
+
+* An OpenShift project with the
+  [`resources.yaml`](https://raw.githubusercontent.com/radanalyticsio/streaming-lab/master/resources.yaml)
+  manifest from this repository installed. To install this file, enter the
+  following command, replacing the `<project name>` with your project:
+   ```
+   oc create -n <project name> -f https://raw.githubusercontent.com/radanalyticsio/streaming-lab/master/resources.yaml
+   ```
 
 ### Synthetic social media update service
 
@@ -36,15 +50,14 @@ updates, there is a service application that will produce these updates. The
 `update-generator` directory contains the source and related files for
 deploying this service.
 
-Before beginning this deployment you should already have a Kafka instance
-running. Please record the hostname and port for the broker as you will need
-it in this command. To deploy the generator simply run the following command
-using the `oc` OpenShift tool:
+To deploy the generator run the following command using the `oc` command line
+tool. You must replace `<kafka-hostname:port>` with the values you recorded
+earlier for the Kafka brokers.
 
 ```
 oc new-app centos/python-36-centos7~https://github.com/radanalyticsio/streaming-lab/ \
   --context-dir=update-generator \
-  -e KAFKA_BROKERS=<INSERT YOUR BROKER HOSTNAME:PORT HERE> \
+  -e KAFKA_BROKERS=<kafka-hostname:port> \
   -e KAFKA_TOPIC=social-firehose \
   --name=emitter
 ```
@@ -78,14 +91,58 @@ There are two services which will be deployed, the `update-transformer`, and
 the `update-visualizer`. The transformer will utilize Apache Spark to process
 the synthetic social media updates and apply sentiment scores to each update.
 The visualizer gives the user an interface to examine some of the work that
-is being done by the transformer, it does this by display updates along with
+is being done by the transformer, it does this by displaying updates along with
 the sentiment scores they have received.
 
 This diagram shows an overview of the architecture for these services:
 
 ![services architecture](assets/services-architecture.svg)
 
-WIP
+### Procedure
+
+1. Launch a Spark cluster. This cluster will be used by the
+   transformer application to process messages from Kafka and generate
+   sentiment scores for the messages. The following command will create a
+   cluster named `mycluster`, note that this cluster is using a
+   specific image to ensure compatibility with the other lab artifacts.
+    ```
+    oshinko create --image docker.io/elmiko/radanalytics-pyspark:2.2.1-streaming-lab mycluster
+    ```
+1. Deploy the update-transformer application. You will need the Kafka broker
+   information as well as the Spark cluster name from the previous step for
+   this command. To build and deploy the transformer use the following command:
+    ```
+    oc new-app --template=oshinko-python-spark-build-dc \
+      -p APPLICATION_NAME=transformer \
+      -p GIT_URI=https://github.com/radanalyticsio/streaming-lab \
+      -p CONTEXT_DIR=update-transformer \
+      -p SPARK_OPTIONS='--packages=org.apache.spark:spark-sql-kafka-0-10_2.11:2.2.1' \
+      -p OSHINKO_CLUSTER_NAME=<cluster name>
+      -e KAFKA_BROKERS=<kafka-hostname:port> \
+      -e KAFKA_IN_TOPIC=social-firehose \
+      -e KAFKA_OUT_TOPIC=sentiments \
+    ```
+1. Deploy the update-visualizer application. You will again need the Kafka
+   broker information for this command. To build and deploy the visualizer
+   use the following command:
+    ```
+    oc new-app centos/python-36-centos7~https://github.com/radanalyticsio/streaming-lab \
+      --context-dir=update-visualizer \
+      -e KAFKA_BROKERS=<kafka-hostname:port> \
+      -e KAFKA_TOPIC=sentiments \
+      --name=visualizer
+    ```
+1. Expose a route to the visualizer. This command will expose an external URL
+   to the visualizer which you will use to communicate with the application.
+    ```
+    oc expose svc/visualizer
+    ```
+1. Request the latest data from the visualizer. The `curl` utility provides a
+   convenient method for accessing the current data in the visualizer. The
+   following command will get that data:
+    ```
+    curl http://`oc get routes/visualizer --template='{{.spec.host}}'`
+    ```
 
 ## Advanced details
 
