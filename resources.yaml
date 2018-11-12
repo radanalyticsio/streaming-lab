@@ -386,7 +386,7 @@ items:
           spec:
             containers:
               - name: ${APPLICATION_NAME}
-                image: quay.io/willbenton/streaming-lab-notebooks:latest
+                image: quay.io/willbenton/streaming-lab-notebooks:madrid-lab
                 env:
                   - name: JUPYTER_NOTEBOOK_PASSWORD
                     value: developer
