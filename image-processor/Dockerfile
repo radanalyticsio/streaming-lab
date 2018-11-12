@@ -1,12 +1,14 @@
 FROM fedora:26
 
 USER root
-RUN mkdir /opt-app-root
+RUN mkdir -p /opt/app-root/
+RUN mkdir -p /opt/app-root/cfg
 
 ADD . /opt/app-root
 
 ADD https://pjreddie.com/media/files/yolov2.weights /opt/app-root/yolo.weights
 ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg /opt/app-root/yolo.cfg
+ADD https://raw.githubusercontent.com/pjreddie/darknet/master/data/coco.names /opt/app-root/cfg/
 
 WORKDIR /opt/app-root
 
