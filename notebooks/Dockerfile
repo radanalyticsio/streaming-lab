@@ -32,7 +32,6 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
     && /opt/conda/bin/pip install /darkflow*.whl tensorflow \
-    && /opt/conda/bin/pip install -r prob-requirements.txt \
     && /opt/conda/bin/jupyter nbextension install --py fileupload \
     && /opt/conda/bin/jupyter nbextension enable --py fileupload \
     && chmod -f g+rw /notebooks $(find /notebooks) 
@@ -46,8 +45,8 @@ RUN chmod -f g+rw /notebooks $(find /notebooks)
 USER $NB_UID
 ENV HOME /home/$NB_USER
 
-LABEL io.k8s.description="Intelligent Streaming Jupyter Notebook." \
-      io.k8s.display-name="Intelligent Streaming Notebook." \
+LABEL io.k8s.description="PySpark Jupyter Notebook." \
+      io.k8s.display-name="PySpark Jupyter Notebook." \
       io.openshift.expose-services="8888:http"
 
 CMD ["/entrypoint", "/usr/local/bin/start.sh"]
