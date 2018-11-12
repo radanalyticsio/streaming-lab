@@ -10,6 +10,7 @@ ADD https://pjreddie.com/media/files/yolov2.weights /data/yolo.weights
 ADD https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg /notebooks/cfg/yolo.cfg
 
 ADD *.whl /
+ADD probreqs /
 
 ENV NB_USER=nbuser
 ENV NB_UID=1011
@@ -32,7 +33,7 @@ RUN chown -R $NB_USER:root /home/$NB_USER /data \
     && /opt/conda/bin/python -m spacy download en \
     && ( /opt/conda/bin/conda clean -qtipsy || echo "conda clean FAILED" ) \
     && /opt/conda/bin/pip install /darkflow*.whl tensorflow \
-    && /opt/conda/bin/pip install -r prob-requirements.txt \
+    && /opt/conda/bin/pip install -r /probreqs \
     && /opt/conda/bin/jupyter nbextension install --py fileupload \
     && /opt/conda/bin/jupyter nbextension enable --py fileupload \
     && chmod -f g+rw /notebooks $(find /notebooks) 
