@@ -13,7 +13,7 @@ from kafka import KafkaProducer
 
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 topic = None
@@ -73,7 +73,7 @@ if __name__ == '__main__':
   parser.add_argument(
           '--topic',
           help='Topic to publish to, env variable KAFKA_TOPIC',
-          default='images')
+          default='raw-images')
   
   args = parse_args(parser)
   
