@@ -19,7 +19,7 @@ RUN INSTALL_PKGS="python3 libstdc++ python3-devel python3-setuptools python3-pip
         pip3 install /opt/app-root/darkflow-1.0.0-cp36-cp36m-linux_x86_64.whl && \
         rm /opt/app-root/requirements.txt
 
-RUN chmod 777 /opt/app-root /opt/app-root/ /opt/app-root/*
+RUN chmod 777 /opt/app-root /opt/app-root/ /opt/app-root/* /opt/app-root/cfg /opt/app-root/cfg/*
 RUN chmod 755 /opt/app-root/app.py
 RUN chown 185 /opt/app-root
 
