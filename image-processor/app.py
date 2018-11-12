@@ -4,7 +4,9 @@ import os
 import json
 import cv2
 
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer, KafkaProducer
+import base64
+import numpy as np
 
 def get_arg(env, default):
     return os.getenv(env) if os.getenv(env, '') is not '' else default
@@ -30,7 +32,7 @@ def main(args):
         value = json.loads(str(msg.value, "utf-8"))
         try:
           image = base64.b64decode(value["contents"])
-          imgcv = cv2.imdecode(numpy.asarray(bytearray(image), dtype=numpy.uint8), cv2.IMREAD_COLOR)
+          imgcv = cv2.imdecode(np.asarray(bytearray(image), dtype=np.uint8), cv2.IMREAD_COLOR)
           predictions = yolo.return_predict(imgcv)
 
           # annotate image with bounding boxes
