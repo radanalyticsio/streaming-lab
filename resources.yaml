@@ -386,7 +386,7 @@ items:
           spec:
             containers:
               - name: ${APPLICATION_NAME}
-                image: docker.io/willb/streaming-lab-notebook:develop
+                image: quay.io/willbenton/streaming-lab-notebooks:latest
                 env:
                   - name: JUPYTER_NOTEBOOK_PASSWORD
                     value: developer
@@ -399,4 +399,3 @@ items:
         value: streaming-lab-notebook
       - name: ROUTE_HOSTNAME
         description: a hostname for the route
-     
