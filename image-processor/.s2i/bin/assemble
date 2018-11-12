@@ -3,6 +3,6 @@
 # Execute the default S2I script
 source ${STI_SCRIPTS_PATH}/assemble
 
-pip install /opt/app-root/darkflow*whl
+pip install $(find / -name darkflow-1.0.0-cp36-cp36m-linux_x86_64.whl)
 curl https://pjreddie.com/media/files/yolov2.weights -o /opt/app-root/yolo.weights
 curl https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2.cfg -o /opt/app-root/yolo.cfg
