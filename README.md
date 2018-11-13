@@ -1,7 +1,7 @@
 # radanalytics.io streaming and event processing lab
 
 This repository contains artifacts and resources to support the streaming and
-event processing labs for radanalytics.io.
+event processing labs for radanalytics.io.  [Our slides from the workshop at Big Data Spain 2018 are here](./BDS-adding-intelligence-to-stream-processing.pdf).
 
 ## Description
 
