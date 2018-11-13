@@ -21,7 +21,7 @@ RUN INSTALL_PKGS="python3 libstdc++ python3-devel python3-setuptools python3-pip
 
 RUN chmod 777 /opt/app-root /opt/app-root/ /opt/app-root/* /opt/app-root/cfg /opt/app-root/cfg/*
 RUN chmod 755 /opt/app-root/app.py
-RUN chown 185 /opt/app-root
+RUN chown -R 185 /opt/app-root
 
 EXPOSE 8080
 
