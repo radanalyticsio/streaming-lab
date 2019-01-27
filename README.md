@@ -106,7 +106,7 @@ This diagram shows an overview of the architecture for these services:
       -p CONTEXT_DIR=update-transformer \
       -e KAFKA_BROKERS=<kafka-hostname:port> \
       -e KAFKA_IN_TOPIC=social-firehose \
-      -e KAFKA_OUT_TOPIC=sentiments \
+      -e KAFKA_OUT_TOPIC=sentiments 
     ```
 1. Deploy the update-visualizer application. You will again need the Kafka
    broker information for this command. To build and deploy the visualizer
