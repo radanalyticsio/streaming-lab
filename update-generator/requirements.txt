@@ -1,4 +1,4 @@
-kafka
+kafka-python
 numpy
-spacy
+spacy==2.0.0
 markovify
