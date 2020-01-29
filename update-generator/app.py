@@ -146,11 +146,20 @@ def update_generator(models, weights=None, hashtag_weights=[8, 2], ut=None, seed
 
 
 def main(args):
+    ready = False
+    
     logging.info('brokers={}'.format(args.brokers))
     logging.info('topic={}'.format(args.topic))
     logging.info('rate={}'.format(args.rate))
     logging.info('source={}'.format(args.source))
-
+    
+    while not ready:
+        try:
+            producer = KafkaProducer(bootstrap_servers=args.brokers)
+            ready = True
+        finally:
+            pass
+    
     logging.info('creating Markov chains')
     
     austen_model = train_markov_gutenberg_txt("austen.txt")
@@ -165,7 +174,6 @@ def main(args):
     update_id = 0
     
     logging.info('creating kafka producer')
-    producer = KafkaProducer(bootstrap_servers=args.brokers)
     
     logging.info('sending lines')
     while True:
